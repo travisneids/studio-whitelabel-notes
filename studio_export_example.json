@@ -1,0 +1,168 @@
+{
+  "description": "A New Flow",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "event": "incomingMessage"
+        },
+        {
+          "next": "sayIntro",
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "name": "sayIntro",
+      "type": "say-play",
+      "transitions": [
+        {
+          "next": "mainMenu",
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "offset": {
+          "x": 120,
+          "y": 250
+        },
+        "loop": 1,
+        "say": "Thank you for calling Glia.",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "mainMenu",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "splitMenuSelection",
+          "event": "keypress"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 130,
+          "y": 520
+        },
+        "loop": 1,
+        "finish_on_key": "#",
+        "say": "Press 1 for sales. Press 2 for support.",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "splitMenuSelection",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "saySalesIntro",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "Sales",
+              "arguments": [
+                "{{widgets.mainMenu.Digits}}"
+              ],
+              "type": "contains",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "saySupportIntro",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "Support",
+              "arguments": [
+                "{{widgets.mainMenu.Digits}}"
+              ],
+              "type": "contains",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.mainMenu.Digits}}",
+        "offset": {
+          "x": 180,
+          "y": 810
+        }
+      }
+    },
+    {
+      "name": "saySupportIntro",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "offset": {
+          "x": 470,
+          "y": 1130
+        },
+        "loop": 1,
+        "say": "Connecting you to a support agent.",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "saySalesIntro",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "offset": {
+          "x": 100,
+          "y": 1130
+        },
+        "loop": 1,
+        "say": "Connecting you to a sales specialist.",
+        "language": "en-US"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
